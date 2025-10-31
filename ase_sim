@@ -1,0 +1,113 @@
+#!/bin/bash
+
+help(){
+	echo "Usage:"
+	echo " ase_sim [OPTIONS] [--]"
+	echo " ase_sim [OPTIONS]"
+	echo " ase_sim -a|--add=<file>"
+	echo " ase_sim -a|--add=<file> -l|--latencies=<arg1><arg2>...<arg6>"
+	echo "Options:"
+	echo -e " -h --help \t Show this screen"
+	echo -e " -a --add = <file> \t Add a new program (it should not exist yet)"
+	echo -e " -l --latencies = <arg1><arg2>...<arg6> \tSet the latencies"
+}
+
+modify_latency(){
+	if [[ "$#" -ne 6 ]]; then
+		echo "Wrong number of args"
+		help
+		exit 1
+	fi
+	arg=("$@")
+	for par in "${arg[@]}"; do
+        	if [[ ! $par  =~ ^[1-9][0-9]*$  ]]; then
+					echo "Wrong arguments"
+					help
+                	exit 1
+        	fi
+	done
+	latencies=('INTEGER_ALU_LATENCY'\
+		'INTEGER_MUL_LATENCY' \
+		'INTEGER_DIV_LATENCY' \
+		'FLOAT_ALU_LATENCY' \
+		'FLOAT_MUL_LATENCY' \
+		'FLOAT_DIV_LATENCY')
+	for ((i=0; i<"${#latencies[@]}"; i++)); do
+        	lat="${latencies[$i]}"
+        	val="${arg[$i]}"
+        	sed -i "s/^$lat = .*/$lat = $val/" "$ASEDIR/gem5/riscv_in_order_hen_patt.py"
+    	done
+	sed -i 's/\r//' "$ASEDIR/gem5/riscv_in_order_hen_patt.py"
+}
+
+add_program(){
+	# extract basename
+	DIR="$1"
+	FILENAME=${DIR##*/}
+	BASENAME=${FILENAME%%.[sc]}
+	# if program does not exist yet
+	if [[ ! -d "$ASEDIR/programs/$BASENAME" ]]; then
+		ase_add $DIR 
+	else
+		echo "Program already exists"
+	fi
+}
+
+# correctness of setup
+ASEDIR=$(grep -E "^ASE_DIR=.*" "$ASEMANAGEPROGRAM/config" | tr -s " " | cut -d "=" -f2 )
+if [[ ! -d "$ASEDIR" ]]; then
+        echo "setup right ase project's path"
+        exit 1
+fi
+
+# getting options
+while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
+  	-a | --add )
+		shift;
+		if [[ ! -f $1 ]]; then
+			echo "No such file"
+			help
+			exit 1
+		fi
+		add_program $1
+		;;
+  	-lt | --latencies )
+		shift;
+		arg=("${@:1:6}")
+		modify_latency "${arg[@]}"
+		jump=6
+		;;
+	-h | --help )
+		help
+		;;
+	* )
+		echo "Wrong option"
+		help
+		exit 1
+esac; shift $jump; done
+if [[ "$1" == '--' ]]; then shift; fi
+
+
+# launch sim
+WORKDIR="$(pwd)"
+cd $ASEDIR
+source ./simulate.sh
+
+# final print
+cp -v "results/$program/stats.txt" "$WORKDIR/stats.txt"
+echo "################# Opening file dump ... ####################"
+cp -v "$program_folder/$program.dump" "$WORKDIR/$program.dump"
+cat "$program_folder/$program.dump"
+echo "######################## Latencies #########################"
+latencies=('INTEGER_ALU_LATENCY'\
+		'INTEGER_MUL_LATENCY' \
+		'INTEGER_DIV_LATENCY' \
+		'FLOAT_ALU_LATENCY' \
+		'FLOAT_MUL_LATENCY' \
+		'FLOAT_DIV_LATENCY')
+for ((i=0; i<"${#latencies[@]}"; i++)); do
+	lat="${latencies[$i]}"
+	echo "$(grep -e "^$lat = [0-9]*$" "$ASEDIR/gem5/riscv_in_order_hen_patt.py")"
+done
+
+cd "$WORKDIR"

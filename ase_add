@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# correctness of input
+if [[ $# -ne 1 ||  ! -f $1 ]]; then
+	echo "No such file"
+	echo "ase_add name_program.[s|c]"
+	exit 1
+fi
+if [[ $1 =~ *.[sc] ]]; then
+	echo "file extension is incorrect"
+	echo "only either *.c or *.s"
+	exit 1
+fi
+
+# correctness of setup
+ASEDIR=$(grep -E "^ASE_DIR=.*" "$ASEMANAGEPROGRAM/config" | tr -s " " | cut -d "=" -f2 )
+if [[ ! -d "$ASEDIR" ]]; then
+	echo "config right ase project's path"
+	exit 1
+fi
+
+# extract basename
+DIR="$1"
+FILENAME=${DIR##*/}
+BASENAME=${FILENAME%%.[sc]}
+
+
+# add program
+DIRPROGRAM="$ASEDIR/programs/$BASENAME"
+if [[ -d "$DIRPROGRAM"  ]]; then
+	rm -rf "$DIRPROGRAM"
+fi
+mkdir "$DIRPROGRAM"
+sed "s|^ASM = \./.*|ASM = ./$FILENAME|"  \
+	"$ASEMANAGEPROGRAM/base_files/Makefile" > "$DIRPROGRAM/Makefile"
+sed -i 's/\r//' "$DIRPROGRAM/Makefile"		# Makefile contains ^M (carriage return from windows)
+ln "$DIR" "$DIRPROGRAM/$FILENAME"			# create an hard link
+cp "$ASEMANAGEPROGRAM/base_files/linker.ld" "$DIRPROGRAM/linker.ld"
+
+# final print
+echo "$BASENAME properly added"
