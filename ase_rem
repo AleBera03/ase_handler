@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# correctness of setup
-ASEDIR=$(grep -E "^ASE_DIR=.*" "$ASEMANAGEPROGRAM/config" | tr -s " " | cut -d "=" -f2 )
-if [[ ! -d "$ASEDIR" ]]; then
-        echo "config right ase toolchain project's path"
-        exit 1
-fi
-
 # declare array
 declare -a programs
 

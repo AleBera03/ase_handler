@@ -12,13 +12,6 @@ if [[ $1 =~ *.[sc] ]]; then
 	exit 1
 fi
 
-# correctness of setup
-ASEDIR=$(grep -E "^ASE_DIR=.*" "$ASEMANAGEPROGRAM/config" | tr -s " " | cut -d "=" -f2 )
-if [[ ! -d "$ASEDIR" ]]; then
-	echo "config right ase project's path"
-	exit 1
-fi
-
 # extract basename
 DIR="$1"
 FILENAME=${DIR##*/}

@@ -53,13 +53,6 @@ add_program(){
 	fi
 }
 
-# correctness of setup
-ASEDIR=$(grep -E "^ASE_DIR=.*" "$ASEMANAGEPROGRAM/config" | tr -s " " | cut -d "=" -f2 )
-if [[ ! -d "$ASEDIR" ]]; then
-        echo "setup right ase project's path"
-        exit 1
-fi
-
 # getting options
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
