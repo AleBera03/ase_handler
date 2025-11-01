@@ -3,7 +3,9 @@
 WORKDIR="$(pwd)"
 echo $WORKDIR
 
-echo 'export PATH="$WORKDIR:$PATH"' >> ~/.bashrc
+grep -qxF "export PATH=\"$WORKDIR:$PATH\"" ~/.bashrc || {
+  echo "export PATH=\"$WORKDIR:$PATH\"" >> ~/.bashrc
+}
 
 git clone https://github.com/cad-polito-it/ase_riscv_gem5_sim.git
 sudo chmod -R +x ase_riscv_gem5_sim
@@ -17,6 +19,7 @@ grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
   echo "ASEDIR=\"$WORKDIR/ase_riscv_gem5_sim\"" >> ~/.bashrc
   echo 'export ASEDIR' >> ~/.bashrc
 }
+source ~/.bashrc
 
 # launch script
 ./utils/installation.sh
