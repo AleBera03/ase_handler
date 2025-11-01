@@ -3,8 +3,8 @@
 WORKDIR="$(pwd)"
 echo $WORKDIR
 
-grep -qxF "export PATH=\"$WORKDIR:$PATH\"" ~/.bashrc || {
-  echo "export PATH=\"$WORKDIR:$PATH\"" >> ~/.bashrc
+grep -qxF "export PATH=\"$WORKDIR:\$PATH\"" ~/.bashrc || {
+  echo "export PATH=\"$WORKDIR:\$PATH\"" >> ~/.bashrc
 }
 
 git clone https://github.com/cad-polito-it/ase_riscv_gem5_sim.git
