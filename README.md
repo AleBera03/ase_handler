@@ -4,16 +4,20 @@ This wrapper includes several commands that enhance the experience of using [`as
 ```
 git clone https://github.com/AleBera03/ase_handler
 ```
-2. Give permission recursively in order to properly execute all script within repository
+2. Check permission of rep with
+```
+ls -la "../path/of/rep"
+```
+3. Give permission recursively if there are not perms
 ```
 sudo chmod -R +x "path/of/rep"
 ```
-3. Execute `script.sh`
+4. Execute `script.sh`
 ```
 cd "path/of/rep"
 ./script.sh
 ```
-4. The above script install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) rep in `'path/of/rep/ase_riscv_gem5_sim'` directory
+5. The above script install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) rep in `'path/of/rep/ase_riscv_gem5_sim'` directory
 
 **NB:** The project is only tested for Ubuntu-22.04 distro (same version of VM proposed during the course)
 
