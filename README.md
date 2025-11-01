@@ -33,7 +33,7 @@ The `script.sh` properly export the env variable, so you can run commands wherev
 
 **Tip:** a combination of `ase_sim` and `ase_rem` should be sufficent
 
-**NB:** the simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim))
+**NB:** the simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program))
 
 
 

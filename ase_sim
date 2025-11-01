@@ -86,6 +86,8 @@ WORKDIR="$(pwd)"
 cd $ASEDIR
 source ./simulate.sh
 
+
+
 # final print
 cp -v "results/$program/stats.txt" "$WORKDIR/stats.txt"
 echo "################# Opening file dump ... ####################"
