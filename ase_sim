@@ -5,11 +5,13 @@ help(){
 	echo " ase_sim [OPTIONS] [--]"
 	echo " ase_sim [OPTIONS]"
 	echo " ase_sim -a|--add=<file>"
+	echo " ase_sim -l|--latencies=<arg1><arg2>...<arg6>"
 	echo " ase_sim -a|--add=<file> -l|--latencies=<arg1><arg2>...<arg6>"
 	echo "Options:"
 	echo -e " -h --help \t Show this screen"
 	echo -e " -a --add = <file> \t Add a new program (it should not exist yet)"
 	echo -e " -l --latencies = <arg1><arg2>...<arg6> \tSet the latencies"
+	echo -e " -t --table \t Produce the pipeline table in .xlsx file (only for WSL2 users)"
 }
 
 modify_latency(){
@@ -54,6 +56,7 @@ add_program(){
 }
 
 # getting options
+flag_gen=0
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
 		shift;
@@ -65,12 +68,29 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		add_program $1
 		;;
   	-lt | --latencies )
-		shift;
+		shift
 		arg=("${@:1:6}")
 		modify_latency "${arg[@]}"
 		jump=6
 		;;
+	-t | --table )
+		shift
+		if [[ -n $(echo uname -r | grep -e "WSL2") ]]; then
+			echo "This kernel is wrong"
+			exit 1
+		fi
+		if [[ -n $(cat /etc/wsl.conf | tr -d " " | grep -e "appendWinsowsPath=false") ]]; then
+			echo "Windows PATH not included"
+			exit 1
+		fi
+		if [[ -z $(which python3) ]]; then
+			echo "python3 is missing"
+			exit
+		fi
+		gen_flag=1
+		;;
 	-h | --help )
+		shift
 		help
 		;;
 	* )
@@ -93,6 +113,15 @@ cp -v "results/$program/stats.txt" "$WORKDIR/stats.txt"
 echo "################# Opening file dump ... ####################"
 cp -v "$program_folder/$program.dump" "$WORKDIR/$program.dump"
 cat "$program_folder/$program.dump"
+if [[ $gen_flag -eq 1 ]]; then
+	echo "############### Opening excel pipeline empty file ... ###################"
+	python3 "$ASEMANAGEPROGRAM/generate_pipeline_table.py" "$program_folder/$program/$program.s"
+	DIRUSER=$(cmd.exe /c echo %USERPROFILE% | tr -d '\r')
+	WINUSER="${DIRUSER##*\\}"
+	mv "$program_folder/$program/$program.xlsx" "/mnt/c/Users/$WINUSER/Documents/$program.xlsx"
+	# view doc https://learn.microsoft.com/it-it/windows/wsl/filesystems
+	powershell.exe start "C:\\Users\\$WINUSER\\Documents\\$program.xlsx"
+fi
 echo "######################## Latencies #########################"
 latencies=('INTEGER_ALU_LATENCY'\
 		'INTEGER_MUL_LATENCY' \

@@ -7,11 +7,12 @@ grep -qxF "export PATH=\"$WORKDIR:\$PATH\"" ~/.bashrc || {
   echo "export PATH=\"$WORKDIR:\$PATH\"" >> ~/.bashrc
 }
 
+cd ..
 git clone https://github.com/cad-polito-it/ase_riscv_gem5_sim.git
 sudo chmod -R +x ase_riscv_gem5_sim
 cd ase_riscv_gem5_sim
-# modify gem_visualizer-dep.sh
-cp -v "../base_files/gem-visualizer_dep.sh" "utils/Linux/Ubuntu/gem-visualizer_dep.sh"
+# sub correct gem_visualizer-dep.sh
+cp -v "../ase_handler/base_files/gem-visualizer_dep.sh" "utils/Linux/Ubuntu/gem-visualizer_dep.sh"
 # set env variable
 grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
   echo "ASEMANAGEPROGRAM=\"$WORKDIR\"" >> ~/.bashrc

@@ -6,18 +6,24 @@ git clone https://github.com/AleBera03/ase_handler
 ```
 2. Check permission of rep with
 ```
-ls -la "../path/of/rep"
+ls -la "../path/to/ase_handler"
 ```
 3. Give permission recursively if there are not perms
 ```
-sudo chmod -R +x "path/of/rep"
+sudo chmod -R +x "path/to/ase_handler"
 ```
 4. Execute `script.sh`
 ```
-cd "path/of/rep"
+cd "path/to/ase_handler"
 ./script.sh
 ```
-5. The above script install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) rep in `'path/of/rep/ase_riscv_gem5_sim'` directory
+5. The above script install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) rep in this way
+```
+father_dir
+    |-- ase_handler
+    |-- ase_riscv_gem5_sim
+    |-- other ...
+```
 
 **NB:** The project is only tested for Ubuntu-22.04 distro (same version of VM proposed during the course)
 
@@ -27,13 +33,38 @@ the ufficial project folder.
 
 ## How ?
 The `script.sh` properly export the env variable, so you can run commands wherever
-- `ase_add`: create the proper folder within ufficial project respecting `Makefile` format and creating an hard link inside [^1]
-- `ase_rem`: fistly list the remaining programs in the ufficial project. Then, it is possible to choose one of them to delete
-- `ase_sim`: start the simulation launching `simulate.sh` (`-h | --help` for more details). It is possible to modify the latencies. Finally, in order to speed the workflow, the option `-a | --add <file>` automatically add the program in the proper folder
 
 **Tip:** a combination of `ase_sim` and `ase_rem` should be sufficent
 
 **NB:** the simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program))
+
+# `ase_add`
+Create the proper folder within ufficial project respecting `Makefile` format and creating an hard link inside [^1]
+Type everywhere
+```
+ase_add <ex.s>
+```
+to produce this
+```
+ase_riscv_gem5_sim
+    |-- programs
+        |-- ex
+            |-- Makefile    # ASM = ./ex.s
+            |-- linked.ld
+            |-- ex.s
+        |-- other_programs ...
+    |-- other ...
+```
+
+# `ase_rem`
+Fistly list the remaining programs in the ufficial project. Then, it is possible to choose one of them to delete
+
+# `ase_sim`
+Start the simulation launching `simulate.sh` (`-h | --help` for more details). It is possible to modify the latencies. Finally, in order to speed the workflow, the option `-a | --add <file>` automatically add the program in the proper folder if there is not yet. \
+**ONLY FOR WSL2 USERS:** with the option `-t | --table` it is possible to generate a excel file creating a link
+```
+C:\Users\<user>\Documents\ex.xlsx <<--->> ase_riscv_gem5_sim/programs/ex/ex.xlsx
+```
 
 
 
