@@ -6,6 +6,7 @@ from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.styles import PatternFill, Alignment, Font, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.formula import ArrayFormula
+import os
 import sys
 
 # configuration
@@ -14,7 +15,7 @@ if len(sys.argv) <= 1:
     exit
 input_file = sys.argv[1] # 0: name of py program; 1: first actual arg
 if (re.match(".*\\.s$", input_file)):
-    base_name, suffix = input_file.split(".")
+    base_name, suffix = os.path.splitext(input_file)
 else:
     print("File format is wrong (only .s)")
     exit
@@ -39,9 +40,9 @@ with open(input_file, "r") as f:
             
 
 # create empty pandas dataframe 
-cols = ["Conteggio"] + ["Disassemblato"] + [f"{i+1}" for i in range(ncc)]
+cols = ["Count"] + ["Disassembled"] + [f"{i+1}" for i in range(ncc)]
 df = pd.DataFrame("", index=range(len(istructions)), columns=cols)
-df["Disassemblato"] = istructions
+df["Disassembled"] = istructions
 
 # export pandas to excel
 df.to_excel(output_file, index=False)
@@ -88,7 +89,7 @@ for cell in ws["B"]:
             max_length = max(max_length, len(str(cell.value)))
     except:
         pass
-adjusted_width = (max_length + 2) * 1.2     # pretty accurate for monospace font case
+adjusted_width = (max_length + 2) * 1.5     # pretty accurate for monospace font case
 ws.column_dimensions["B"].width = adjusted_width
 ws.freeze_panes = ws["C2"]
 
