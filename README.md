@@ -1,5 +1,5 @@
 # Architetture dei sistemi di elaborazione | PoliTo: 	`ase_handler` wrapper of [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim)
-This wrapper includes several commands that enhance the experience of using [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim). Here the using overall flow:
+This wrapper includes several commands that enhance the experience of using [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim). Here the using overall flow from zero:
 1. Use 	`https`
 ```
 git clone https://github.com/AleBera03/ase_handler
@@ -8,7 +8,7 @@ git clone https://github.com/AleBera03/ase_handler
 ```
 ls -la "../path/to/ase_handler"
 ```
-3. Give permission recursively if there are not perms
+3. Give permission recursively if there are not execution perms
 ```
 sudo chmod -R +x "path/to/ase_handler"
 ```
@@ -33,7 +33,35 @@ father_dir
     |-- other ...
 ```
 
+**NB:** If in your system `ase_riscv_gem5_sim` is already installed, then clone `ase_handler` in this way too
+```
+father_dir
+    |-- ase_handler     # clone here
+    |-- ase_riscv_gem5_sim
+    |-- other ...
+```
+
 **NB:** The project is only tested for Ubuntu-22.04 distro (same version of VM proposed during the course)
+
+## Manual setup of environment
+Indeed, if you want to *manually setup* (rather than launching `setup.sh`, e.g. when you have already installed `ase_riscv_gem5_sim`) the flow is simple:
+1. write at the bottom of `~/.bashrc` file, as in this example
+```
+export PATH="/home/ale_bera/ase_handler:$PATH"      # add dir of ase_handler rep to PATH
+ASEMANAGEPROGRAM="/home/ale_bera/ase_handler"       # dir of ase_handler rep
+export ASEMANAGEPROGRAM
+ASEDIR="/home/ale_bera/ase_riscv_gem5_sim"          # dir of ase_riscv_gem5_sim rep
+export ASEDIR
+```
+
+**NB:** At this point the folder scheme as above is not more mandatory. It is sufficent properly set every directories you want
+
+2. update changes
+```
+source ~/.bashrc
+```
+
+3. remember to [install/updagre py libraries](#generate_pipeline_tablepy)
 
 ## Why ?
 The *goal* of this project is to avoid manual and repetitive cli operations throught folders. Hence, I implemented three very simple command capable to *handle* the source code even outside
@@ -42,9 +70,9 @@ the ufficial project folder.
 ## How ?
 The `setup.sh` properly export the env variable, so you can run commands wherever
 
-**Tip:** a combination of `ase_sim` and `ase_rem` should be sufficent
+**Tip:** A combination of `ase_sim` and `ase_rem` should be sufficent
 
-**NB:** the simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program))
+**NB:** The simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program))
 
 # `ase_add`
 Create the proper folder within ufficial project respecting `Makefile` format and creating an hard link inside [^1]
@@ -90,7 +118,7 @@ ase_riscv_gem5_sim
         |-- other_programs ...
     |-- others ...
 ```
-**ONLY FOR WSL2 USERS:** with the option `-t | --table` the excel file is moved to the following windows folder
+**ONLY FOR WSL2 USERS:** With the option `-t | --table` the excel file is moved to the following windows folder
 ```
 C:\%USERPROFILE%\Documents
 ```
@@ -104,7 +132,12 @@ Required libraries:
 - `pandas`
 - `openpyxl`
 
-The `setup.sh` file already installs or upgrades above packages.
+The `setup.sh` file already installs or upgrades above packages
+```
+python3 -m pip install --upgrade pip setuptools wheel
+python3 -m pip install --upgrade pandas
+python3 -m pip install --upgrade openpyxl
+```
 
 
-[^1]: the role of hard link is to sync changes from original file towards the one within ufficial project
+[^1]: The role of hard link is to sync changes from original file towards the one within ufficial project

@@ -3,17 +3,23 @@
 WORKDIR="$(pwd)"
 echo $WORKDIR
 
+# if ufficial project is already installed
+flaga=0
+if [[ -d "../ase_riscv_gem5_sim" ]]; then
+  flaga=1
+fi
+
 grep -qxF "export PATH=\"$WORKDIR:\$PATH\"" ~/.bashrc || {
   echo "export PATH=\"$WORKDIR:\$PATH\"" >> ~/.bashrc
 }
 
 cd ..
 FATHERFIR="$(pwd)"
-git clone https://github.com/cad-polito-it/ase_riscv_gem5_sim.git
-sudo chmod -R +x ase_riscv_gem5_sim
-cd ase_riscv_gem5_sim
-# substitute correct gem_visualizer-dep.sh
-cp -v "../ase_handler/base_files/gem-visualizer_dep.sh" "utils/Linux/Ubuntu/gem-visualizer_dep.sh"
+if [[ $flaga -eq 0 ]]; then
+  git clone https://github.com/cad-polito-it/ase_riscv_gem5_sim.git
+  sudo chmod -R +x ase_riscv_gem5_sim
+  cd ase_riscv_gem5_sim
+fi
 # set env variable
 grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
   echo "ASEMANAGEPROGRAM=\"$WORKDIR\"" >> ~/.bashrc
@@ -23,8 +29,12 @@ grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
 }
 source ~/.bashrc
 
-# launch script
-./utils/installation.sh
+if [[ $flaga -eq 0 ]]; then
+  # substitute correct gem_visualizer-dep.sh
+  cp -v "../ase_handler/base_files/gem-visualizer_dep.sh" "utils/Linux/Ubuntu/gem-visualizer_dep.sh"
+  # launch script
+  ./utils/installation.sh
+fi
 
 # install libraries for python script
 # view doc https://packaging.python.org/en/latest/tutorials/installing-packages/#
