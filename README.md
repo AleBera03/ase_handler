@@ -20,7 +20,7 @@ cd "path/to/ase_handler"
 ```
 . ./setup.sh
 ```
-oppure
+or
 ```
 source ./setup.sh
 ```
@@ -44,7 +44,7 @@ father_dir
 **NB:** The project is only tested for Ubuntu-22.04 distro (same version of VM proposed during the course)
 
 ## Manual setup of environment
-Indeed, if you want to *manually setup* (rather than launching `setup.sh`, e.g. when you have already installed `ase_riscv_gem5_sim`) the flow is simple:
+In contrast, if you want to *manually setup* (rather than launching `setup.sh`, e.g. when you have already installed `ase_riscv_gem5_sim`) the flow is simple:
 1. write at the bottom of `~/.bashrc` file, as in this example
 ```
 export PATH="/home/ale_bera/ase_handler:$PATH"      # add dir of ase_handler rep to PATH
@@ -54,14 +54,14 @@ ASEDIR="/home/ale_bera/ase_riscv_gem5_sim"          # dir of ase_riscv_gem5_sim 
 export ASEDIR
 ```
 
-**NB:** At this point the folder scheme as above is not more mandatory. It is sufficent properly set every directories you want
+**NB:** At this point the folder scheme as above is not more mandatory. It is sufficent to properly set every directories you want
 
 2. update changes
 ```
 source ~/.bashrc
 ```
 
-3. remember to [install/updagre py libraries](#generate_pipeline_tablepy)
+3. remember to [install/upgrade py libraries](#generate_pipeline_tablepy)
 
 ## Why ?
 The *goal* of this project is to avoid manual and repetitive cli operations throught folders. Hence, I implemented three very simple command capable to *handle* the source code even outside
@@ -127,12 +127,12 @@ https://github.com/user-attachments/assets/7209d6f2-1889-4364-af9e-a0c6d699a166
 
 
 # `generate_pipeline_table.py`
-This python script is able to generate a well formatted excel file to easily build the pipeline by hand.\
+This python script is able to generate a well formatted excel file on which easily build the pipeline by hand.\
 Required libraries:
 - `pandas`
 - `openpyxl`
 
-The `setup.sh` file already installs or upgrades above packages
+The `setup.sh` file already installs or upgrades above packages executing theese lines
 ```
 python3 -m pip install --upgrade pip setuptools wheel
 python3 -m pip install --upgrade pandas
