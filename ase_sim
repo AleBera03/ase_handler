@@ -59,7 +59,7 @@ add_program(){
 flag_gen=0
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
-		shift;
+		shift
 		if [[ ! -f $1 ]]; then
 			echo "No such file"
 			help
@@ -74,7 +74,6 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		jump=6
 		;;
 	-t | --table )
-		shift
 		if [[ -n $(echo uname -r | grep -e "WSL2") ]]; then
 			echo "This kernel is wrong"
 			exit 1
@@ -90,7 +89,6 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		gen_flag=1
 		;;
 	-h | --help )
-		shift
 		help
 		exit
 		;;
@@ -102,21 +100,22 @@ esac; shift $jump; done
 if [[ "$1" == '--' ]]; then shift; fi
 
 
-# launch sim
 WORKDIR="$(pwd)"
 cd $ASEDIR
-source ./simulate.sh
 
+# launch sim
+source ./simulate.sh 
 
 # final print
-cp -v "results/$program/stats.txt" "$WORKDIR/stats.txt"
+cp -v "results/$program/stats.txt" "$WORKDIR/stats_$program.txt"
 echo -e "\n ################# Opening file dump ... #################### \n"
 cp -v "$program_folder/$program.dump" "$WORKDIR/$program.dump"
 cat "$program_folder/$program.dump"
+# create pipeline table
 if [[ -f "$ASEDIR/programs/$program/$program.s" ]]; then
+	echo -e "\n #################### Opening excel file ################### \n"
 	python3 "$ASEMANAGEPROGRAM/generate_pipeline_table.py" "$ASEDIR/programs/$program/$program.s"
 	if [[ $gen_flag -eq 1 ]]; then
-		echo -e "\n ############### Opening excel pipeline empty file ... ################### \n"
 		DIRUSER=$(cmd.exe /c echo %USERPROFILE% | tr -d '\r')
 		WINUSER="${DIRUSER##*\\}"
 		mv "$ASEDIR/programs/$program/$program.xlsx" "/mnt/c/Users/$WINUSER/Documents/$program.xlsx"
