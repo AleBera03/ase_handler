@@ -7,11 +7,15 @@ help(){
 	echo " ase_sim -a|--add=<file>"
 	echo " ase_sim -l|--latencies=<arg1><arg2>...<arg6>"
 	echo " ase_sim -a|--add=<file> -l|--latencies=<arg1><arg2>...<arg6>"
+	echo " ase_sim -o|-out"
+	echo " ase_sim -o|-out -t"
+	echo " ase_sim -i|--in=<folder_dest>"
 	echo "Options:"
 	echo -e " -h --help \t Show this screen"
 	echo -e " -a --add = <file> \t Add a new program (it should not exist yet)"
 	echo -e " -lt --latencies = <arg1><arg2>...<arg6> \t Set the latencies"
 	echo -e " -t --table \t Produce the pipeline table in .xlsx file (only for WSL2 users) toward Documents folder in windows"
+	echo -e " -o --out \t Simulate program with out of order architecture (using Konata)"
 }
 
 modify_latency(){
@@ -53,10 +57,15 @@ add_program(){
 	else
 		echo "Program already exists"
 	fi
+	sim_option="./programs/$BASENAME $sim_option"
 }
+
+WORKDIR="$(pwd)"
+folder_dest="$WORKDIR"
 
 # getting options
 flag_gen=0
+sim_option=""
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
 		shift
@@ -66,6 +75,11 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 			exit 1
 		fi
 		add_program $1
+		;;
+	-i | --in )
+		shift
+		folder_dest="$1"
+		sim_option="$sim_option -i $folder_dest"
 		;;
   	-lt | --latencies )
 		shift
@@ -88,6 +102,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		fi
 		gen_flag=1
 		;;
+	-o | --out )
+
+		;;
 	-h | --help )
 		help
 		exit
@@ -100,29 +117,27 @@ esac; shift $jump; done
 if [[ "$1" == '--' ]]; then shift; fi
 
 
-WORKDIR="$(pwd)"
-cd $ASEDIR
-
 # launch sim
-source ./simulate.sh 
+cd $ASEDIR
+source "./simulate.sh $sim_option"
 
 # final print
-cp -v "results/$program/stats.txt" "$WORKDIR/stats_$program.txt"
+cp -v "results/$program/stats.txt" "$folder_dest/stats_$program.txt"
 echo -e "\n ################# Opening file dump ... #################### \n"
-cp -v "$program_folder/$program.dump" "$WORKDIR/$program.dump"
+cp -v "$program_folder/$program.dump" "$folder_dest/$program.dump"
 cat "$program_folder/$program.dump"
 # create pipeline table
 if [[ -f "$ASEDIR/programs/$program/$program.s" ]]; then
-	echo -e "\n #################### Opening excel file ################### \n"
 	python3 "$ASEMANAGEPROGRAM/generate_pipeline_table.py" "$ASEDIR/programs/$program/$program.s"
 	if [[ $gen_flag -eq 1 ]]; then
+		echo -e "\n #################### Opening excel file ################### \n"
 		DIRUSER=$(cmd.exe /c echo %USERPROFILE% | tr -d '\r')
 		WINUSER="${DIRUSER##*\\}"
 		mv "$ASEDIR/programs/$program/$program.xlsx" "/mnt/c/Users/$WINUSER/Documents/$program.xlsx"
 		# view doc https://learn.microsoft.com/it-it/windows/wsl/filesystems
 		powershell.exe start "C:\\Users\\$WINUSER\\Documents\\$program.xlsx"
 	else
-		ln "$ASEDIR/programs/$program/$program.xlsx" "$WORKDIR/$program.xlsx"
+		mv "$ASEDIR/programs/$program/$program.xlsx" "$folder_dest/$program.xlsx"
 	fi
 fi
 echo -e "\n ######################## Latencies ######################### \n"
