@@ -103,7 +103,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		gen_flag=1
 		;;
 	-o | --out )
-
+		# TODO
 		;;
 	-h | --help )
 		help
@@ -119,10 +119,12 @@ if [[ "$1" == '--' ]]; then shift; fi
 
 # launch sim
 cd $ASEDIR
-source "./simulate.sh $sim_option"
+echo "simulate.sh $sim_option"
+source simulate.sh $sim_option
 
 # final print
 cp -v "results/$program/stats.txt" "$folder_dest/stats_$program.txt"
+cp -v "$program_folder/trace.out" "$folder_dest/trace.out"
 echo -e "\n ################# Opening file dump ... #################### \n"
 cp -v "$program_folder/$program.dump" "$folder_dest/$program.dump"
 cat "$program_folder/$program.dump"

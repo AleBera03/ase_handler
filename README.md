@@ -25,26 +25,34 @@ or
 source ./setup.sh
 ```
  
-The above script install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) rep in this way
+The above script:
+- install [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5_sim) 
+- install [`Konata`](https://github.com/shioyadan/Konata)
+- set all environments in `~/.bashrc` file
+- install py libraries to run python script
+
+in this way
 ```
 father_dir
     |-- ase_handler
     |-- ase_riscv_gem5_sim
+    |-- Konata
     |-- other ...
 ```
 
-**NB:** If in your system `ase_riscv_gem5_sim` is already installed, then clone `ase_handler` in this way too
+**NB:** If in your system `ase_riscv_gem5_sim` and/or `Konata` is already installed, then clone `ase_handler` in this way too
 ```
 father_dir
     |-- ase_handler     # clone here
     |-- ase_riscv_gem5_sim
+    |-- Konata
     |-- other ...
 ```
 
 **NB:** The project is only tested for Ubuntu-22.04 distro (same version of VM proposed during the course)
 
 ## Manual setup of environment
-In contrast, if you want to *manually setup* (rather than launching `setup.sh`, e.g. when you have already installed `ase_riscv_gem5_sim`) the flow is simple:
+In contrast, if you want to *manually setup* (rather than launching `setup.sh`, e.g. when you have already installed `ase_riscv_gem5_sim` and `Konata`) the flow is simple:
 1. write at the bottom of `~/.bashrc` file, as in this example
 ```
 export PATH="/home/ale_bera/ase_handler:$PATH"      # add dir of ase_handler rep to PATH
@@ -52,6 +60,7 @@ ASEMANAGEPROGRAM="/home/ale_bera/ase_handler"       # dir of ase_handler rep
 export ASEMANAGEPROGRAM
 ASEDIR="/home/ale_bera/ase_riscv_gem5_sim"          # dir of ase_riscv_gem5_sim rep
 export ASEDIR
+export PATH="/home/ale_bera/Konata:$PATH"
 ```
 
 **NB:** At this point the folder scheme as above is not more mandatory. It is sufficent to properly set every directories you want
@@ -124,10 +133,11 @@ to
         |-- ex.xlsx
         |-- ex.dump
         |-- stats_ex.txt
-        |-- ...
+        |-- trace.out
     |-- ...
 ```
 **NB:** notice that with `-i --in` option even other result files will be moved within typed folder
+
 **ONLY FOR WSL2 USERS:** With the option `-t | --table` the excel file is moved to the following windows folder
 ```
 C:\%USERPROFILE%\Documents
