@@ -1,5 +1,48 @@
 #!/bin/bash
 
+help(){
+	echo "Usage:"
+	echo " ase_sim [OPTIONS] [--]"
+	echo " ase_sim -a|--all"
+	echo "Options:"
+	echo -e " -a --add \t Remove all programs"
+}
+
+list_rem(){
+	find "$ASEDIR/programs/" -mindepth 1 -maxdepth 1 > ./tmp.txt
+	if [[ $(cat ./tmp.txt | wc -l) -eq 0  ]]; then
+		echo "no remaining programs"
+		rm ./tmp.txt
+		exit 0
+	fi
+	echo "remaining programs:"
+	while read -r line; do
+			echo -e "${line##*/}"
+	done < ./tmp.txt
+	rm ./tmp.txt
+}
+
+
+
+# getting options
+if [[ -n $1 && ! "$1" =~ ^- && ! "$1" == "--" ]]; then
+	echo "Wrong option"
+	exit 1
+fi
+while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
+  	-a | --all )
+		[ -d "$ASEDIR/results" ] && rm -rf $ASEDIR/results/*
+		[ -d "$ASEDIR/programs" ] && rm -rf $ASEDIR/programs/*
+		list_rem
+		exit 0
+		;;
+	* )
+		echo "Wrong option"
+		help
+		exit 1
+esac; shift $jump; done
+if [[ "$1" == '--' ]]; then shift; fi
+
 # declare array
 declare -a programs
 
@@ -32,18 +75,7 @@ fi
 
 
 # delete selected dir
-rm -rf "${programs[$ans]}"
-
-# final prints
-find "$ASEDIR/programs/" -mindepth 1 -maxdepth 1 > ./tmp.txt
-if [[ $(cat ./tmp.txt | wc -l) -eq 0  ]]; then
-	echo "no remaining programs"
-	rm ./tmp.txt
-	exit 0
-fi
-echo "remaining programs:"
-while read -r line; do
-        echo -e "${line##*/}"
-done < ./tmp.txt
-rm ./tmp.txt
-
+program_folder="${programs[$ans]}"
+rm -rf $program_folder
+rm -rf "$ASEDIR/results/${program_folder##*/}"
+list_rem

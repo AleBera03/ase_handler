@@ -15,6 +15,7 @@ help(){
 	echo -e " -a --add = <file> \t Add a new program (it should not exist yet)"
 	echo -e " -lt --latencies = <arg1><arg2>...<arg6> \t Set the latencies"
 	echo -e " -t --table \t Produce the pipeline table in .xlsx file (only for WSL2 users) toward Documents folder in windows"
+	echo -e " -i --in = <folder_dest> \t Path to move all results file (do not confuse with simulate.sh option)"
 	echo -e " -o --out \t Simulate program with out of order architecture (using Konata)"
 }
 
@@ -54,10 +55,8 @@ add_program(){
 	# if program does not exist yet
 	if [[ ! -d "$ASEDIR/programs/$BASENAME" ]]; then
 		ase_add $DIR 
-	else
-		echo "Program already exists"
 	fi
-	sim_option="./programs/$BASENAME $sim_option"
+	sim_option="-i $ASEDIR/programs/$BASENAME $sim_option"
 }
 
 WORKDIR="$(pwd)"
@@ -65,7 +64,12 @@ folder_dest="$WORKDIR"
 
 # getting options
 flag_gen=0
+flagi=0
 sim_option=""
+if [[ -n $1 && ! "$1" =~ ^- && ! "$1" == "--" ]]; then
+	echo "Wrong option"
+	exit 1
+fi
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
 		shift
@@ -78,8 +82,11 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		;;
 	-i | --in )
 		shift
-		folder_dest="$1"
-		sim_option="$sim_option -i $folder_dest"
+		flagi=1
+		folder_dest=$1
+		if [[ ! -d $folder_dest ]]; then
+			mkdir $folder_dest
+		fi
 		;;
   	-lt | --latencies )
 		shift
@@ -122,12 +129,22 @@ cd $ASEDIR
 echo "simulate.sh $sim_option"
 source simulate.sh $sim_option
 
+if [[ $? -ne 0 ]]; then
+	echo "Something gone wrong during simulation"
+	exit 1
+fi
+
 # final print
-cp -v "results/$program/stats.txt" "$folder_dest/stats_$program.txt"
-cp -v "$program_folder/trace.out" "$folder_dest/trace.out"
+cd "$WORKDIR"
+act_program_folder="/$ASEDIR/$program_folder"
+if [[ $flagi -eq 1 ]]; then
+	act_program_folder=$program_folder
+fi
+cp -v "$ASEDIR/results/$program/stats.txt" "$folder_dest/stats_$program.txt"
+# cp -v "$program_folder/trace.out" "$folder_dest/trace.out"
 echo -e "\n ################# Opening file dump ... #################### \n"
-cp -v "$program_folder/$program.dump" "$folder_dest/$program.dump"
-cat "$program_folder/$program.dump"
+cp -v "$act_program_folder/$program.dump" "$folder_dest/$program.dump"
+cat "$act_program_folder/$program.dump"
 # create pipeline table
 if [[ -f "$ASEDIR/programs/$program/$program.s" ]]; then
 	python3 "$ASEMANAGEPROGRAM/generate_pipeline_table.py" "$ASEDIR/programs/$program/$program.s"
@@ -153,5 +170,3 @@ for ((i=0; i<"${#latencies[@]}"; i++)); do
 	lat="${latencies[$i]}"
 	echo "$(grep -e "^$lat = [0-9]*$" "$ASEDIR/gem5/riscv_in_order_hen_patt.py")"
 done
-
-cd "$WORKDIR"

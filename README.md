@@ -81,7 +81,7 @@ The `setup.sh` properly export the env variable, so you can run commands whereve
 
 **Tip:** A combination of `ase_sim` and `ase_rem` should be sufficent
 
-**NB:** The simulation run in interactive mode every time (read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program))
+**NB:** The simulation run in interactive mode every time, unless you run `ase_sim` with `-a | --add <file>` option. Read [here](https://github.com/cad-polito-it/ase_riscv_gem5_sim?tab=readme-ov-file#howto---simulate-a-program).
 
 # `ase_add`
 Create the proper folder within ufficial project respecting `Makefile` format and creating an hard link inside [^1]
@@ -110,9 +110,20 @@ Fistly list the remaining programs in the ufficial project. Then, it is possible
 
 https://github.com/user-attachments/assets/bbdd93ba-713a-40ea-8b14-a59e437e38c6
 
+With `-a | --all` option it is possible delete every file and subdir of both
+```
+ase_riscv_gem5_sim
+    |-- programs
+        XXXX
+    |-- results
+        XXXX
+    |-- other ...
+```
 
 # `ase_sim`
-Start the simulation launching `simulate.sh` (`-h | --help` for more details). It is possible to modify the latencies. In addition, in order to speed the workflow, the option `-a | --add <file>` automatically add the program in the proper folder if there is not yet.
+Start the simulation launching `simulate.sh` (`-h | --help` for more details). It is possible to modify the latencies. In addition, in order to speed the workflow, the option `-a | --add <file>` automatically add the program in the proper folder if there is not yet and then it run it (without choosing option).
+
+**NB:** it is possible to use `-a | --add <file>` even when program already exists, e.g. if one wants to simulate a certain program
 
 https://github.com/user-attachments/assets/1c8b0a45-8e7d-4a9b-93ad-20a07cde56bc
 
@@ -133,7 +144,7 @@ to
         |-- ex.xlsx
         |-- ex.dump
         |-- stats_ex.txt
-        |-- trace.out
+        |-- trace.out       # or something.log
     |-- ...
 ```
 **NB:** notice that with `-i --in` option even other result files will be moved within typed folder

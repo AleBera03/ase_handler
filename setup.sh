@@ -9,7 +9,7 @@ install_ase_riscv_gem5_sim(){
 
 install_konata(){
   # install node.js
-  sudo apt-get curl
+  sudo apt-get install curl
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
   \. "$HOME/.nvm/nvm.sh"
   nvm install 24
@@ -26,7 +26,7 @@ install_konata(){
 WORKDIR="$(pwd)"
 echo $WORKDIR
 
-# if ufficial project is already installed
+# if ufficial project is already installed "near" ase_handler
 flaga=0
 if git -C "../ase_riscv_gem5_sim" rev-parse --is-inside-work-tree &>/dev/null; then
   flaga=1
