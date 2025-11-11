@@ -59,6 +59,13 @@ add_program(){
 	sim_option="-i $ASEDIR/programs/$BASENAME $sim_option"
 }
 
+set_outorder(){
+	cp "$ASEDIR/setup_default" "$ASEDIR/setup_default_mod"
+	sed -i 's/export GEM5_CPU_IN_ORDER=true/export GEM5_CPU_IN_ORDER=false'
+	predictors=('' '' '')
+	# TODO
+}
+
 WORKDIR="$(pwd)"
 folder_dest="$WORKDIR"
 
@@ -66,10 +73,6 @@ folder_dest="$WORKDIR"
 flag_gen=0
 flagi=0
 sim_option=""
-if [[ -n $1 && ! "$1" =~ ^- && ! "$1" == "--" ]]; then
-	echo "Wrong option"
-	exit 1
-fi
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
 		shift
@@ -110,7 +113,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		gen_flag=1
 		;;
 	-o | --out )
-		# TODO
+		set_outorder
 		;;
 	-h | --help )
 		help
@@ -122,6 +125,10 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		exit 1
 esac; shift $jump; done
 if [[ "$1" == '--' ]]; then shift; fi
+if [[ -n $1 ]]; then
+	echo "Wrong option"
+	exit 1
+fi
 
 
 # launch sim

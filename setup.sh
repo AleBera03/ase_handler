@@ -8,19 +8,11 @@ install_ase_riscv_gem5_sim(){
 }
 
 install_konata(){
-  # install node.js
-  sudo apt-get install curl
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-  \. "$HOME/.nvm/nvm.sh"
-  nvm install 24
-  node -v # Should print "v24.11.0".
-  npm -v # Should print "11.6.1".
-  # clone Konata
-  cd "$WORKDIR/.."
-  git clone "https://github.com/shioyadan/Konata"
-  sudo chmod -R +x Konata
-  cd Konata
-  ./install.sh
+  cd ..
+  wget https://github.com/shioyadan/Konata/releases/download/v0.39/konata-linux-x64.tar.gz
+  tar -xvzf konata-linux-x64.tar.gz
+  rm README.md LICENSE.md THIRD-PARTY-LICENSES.md
+  cd $WORKDIR
 }
 
 WORKDIR="$(pwd)"
@@ -34,7 +26,7 @@ fi
 
 # if konata is already installed "near" ase_handler
 flagk=0
-if git -C "../Konata" rev-parse --is-inside-work-tree &>/dev/null; then
+if [[ -d "../konata-linux-x64" ]]; then
   flagk=1
 fi
 
@@ -56,8 +48,10 @@ grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
   echo "ASEDIR=\"$FATHERDIR/ase_riscv_gem5_sim\"" >> ~/.bashrc
   echo 'export ASEDIR' >> ~/.bashrc
 }
-grep -qxF "export PATH=\"$FATHERDIR/Konata:\$PATH\"" ~/.bashrc || {
-    echo "export PATH=\"$FATHERDIR/../Konata:\$PATH\"" >> ~/.bashrc
+grep -qxF "export PATH=\"$FATHERDIR/konata-linux-x64:\$PATH\"" ~/.bashrc || {
+    echo "KONATADIR=\"$FATHERDIR/konata-linux-x64\""
+    echo "export KONATADIR"
+    echo "export PATH=\"$FATHERDIR/konata-linux-x64:\$PATH\"" >> ~/.bashrc
 }
 source ~/.bashrc
 
