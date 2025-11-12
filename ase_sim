@@ -61,9 +61,38 @@ add_program(){
 
 set_outorder(){
 	cp "$ASEDIR/setup_default" "$ASEDIR/setup_default_mod"
-	sed -i 's/export GEM5_CPU_IN_ORDER=true/export GEM5_CPU_IN_ORDER=false'
-	predictors=('' '' '')
-	# TODO
+	sed -i 's/export GEM5_CPU_IN_ORDER=true/export GEM5_CPU_IN_ORDER=false/' "$ASEDIR/setup_default_mod"
+	# set riscv_o3_custom
+	gem5script="$ASEDIR/gem5/riscv_o3_custom.py"
+	sed -i "s|export GEM5_SIMULATION_SCRIPT=\"\.\/gem5\/riscv_in_order_hen_patt\.py\"|#&|" "$ASEDIR/setup_default_mod"
+	sed -i "s|#export GEM5_SIMULATION_SCRIPT=\"\.\/gem5\/riscv_o3_custom\.py\"|export GEM5_SIMULATION_SCRIPT=\"./gem5/riscv_o3_custom.py\"|" "$ASEDIR/setup_default_mod"
+	sed -i "s|export PIPELINE_VISUALIZER=.*|export PIPELINE_VISUALIZER=$KONATADIR/konata|" "$ASEDIR/setup_default_mod"
+	# choose a BP
+	predictors=('LocalBP' 'TournamentBP' 'BiModeBP')
+	ind=0
+	for i in "${predictors[@]}"; do
+		echo -e "$ind) \t $i"
+		((ind++))
+	done
+	read -rp "Choose a BP: " ans
+	if [[ ! $ans =~ ^[0-2]$ ]]; then
+		echo "Wrong number"
+		exit 1
+	fi
+	BP="create_${predictors[$ans]}()"
+	while true; do
+		read -rp "Configure create_predictor.py [y/n]: " ans
+		if [[ $ans =~ ^[ynYN]$ ]]; then
+			break
+		fi
+    	echo "Please enter 'y' or 'n'"
+	done
+	if [[ $ans == "y" ]]; then
+		vim "$ASEDIR/gem5/create_predictor.py"	
+	fi
+	sed -i "s/the_cpu.branchPred = predictor.*/the_cpu.branchPred = predictor.$BP/" $gem5script
+	sim_option="$sim_option -s $ASEDIR/setup_default_mod"
+	trace_out="trace.out"
 }
 
 WORKDIR="$(pwd)"
@@ -73,6 +102,7 @@ folder_dest="$WORKDIR"
 flag_gen=0
 flagi=0
 sim_option=""
+trace_out="gem5_inorder.log"
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
   	-a | --add )
 		shift
@@ -113,6 +143,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do jump=1; case $1 in
 		gen_flag=1
 		;;
 	-o | --out )
+		echo $ASEDIR
 		set_outorder
 		;;
 	-h | --help )
@@ -143,15 +174,9 @@ fi
 
 # final print
 cd "$WORKDIR"
-act_program_folder="/$ASEDIR/$program_folder"
-if [[ $flagi -eq 1 ]]; then
-	act_program_folder=$program_folder
-fi
 cp -v "$ASEDIR/results/$program/stats.txt" "$folder_dest/stats_$program.txt"
-# cp -v "$program_folder/trace.out" "$folder_dest/trace.out"
-echo -e "\n ################# Opening file dump ... #################### \n"
-cp -v "$act_program_folder/$program.dump" "$folder_dest/$program.dump"
-cat "$act_program_folder/$program.dump"
+cp -v "$ASEDIR/results/$program/$trace_out" "$folder_dest/$trace_out"
+cp -v "$ASEDIR/programs/$program/$program.dump" "$folder_dest/$program.dump"
 # create pipeline table
 if [[ -f "$ASEDIR/programs/$program/$program.s" ]]; then
 	python3 "$ASEMANAGEPROGRAM/generate_pipeline_table.py" "$ASEDIR/programs/$program/$program.s"

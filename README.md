@@ -61,7 +61,7 @@ export ASEMANAGEPROGRAM
 ASEDIR="/home/ale_bera/ase_riscv_gem5_sim"          # dir of ase_riscv_gem5_sim rep
 export ASEDIR
 # konata env
-KONATADIR="/home/ale_bera/linux-linux-x64"
+KONATADIR="/home/ale_bera/konata-linux-x64"
 export KONATADIR
 export PATH="/home/ale_bera/konata-linux-x64:$PATH"
 ```
@@ -165,10 +165,10 @@ Following [`ase_riscv_gem5_sim`](https://github.com/cad-polito-it/ase_riscv_gem5
 ase_sim -o [OPTIONS]
 ```
 ```
-1) localBP
-2) tournmentBP
-3) BimodeBP
-Choose an option: 
+1) LocalBP
+2) TournamentBP
+3) BiModeBP
+Choose a BP: 
 ```
 Right now, for further configuration modify `ase_riscv_gem5_sim/gem5/create_predictor.py`
 

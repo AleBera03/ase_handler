@@ -49,8 +49,8 @@ grep -qxF 'export ASEMANAGEPROGRAM' ~/.bashrc || {
   echo 'export ASEDIR' >> ~/.bashrc
 }
 grep -qxF "export PATH=\"$FATHERDIR/konata-linux-x64:\$PATH\"" ~/.bashrc || {
-    echo "KONATADIR=\"$FATHERDIR/konata-linux-x64\""
-    echo "export KONATADIR"
+    echo "KONATADIR=\"$FATHERDIR/konata-linux-x64\"" >> ~/.bashrc
+    echo "export KONATADIR" >> ~/.bashrc
     echo "export PATH=\"$FATHERDIR/konata-linux-x64:\$PATH\"" >> ~/.bashrc
 }
 source ~/.bashrc
